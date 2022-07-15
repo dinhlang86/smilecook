@@ -14,7 +14,6 @@ from main.extensions import image_set
 
 
 recipe_schema = RecipeSchema()
-recipe_list_schema = RecipeSchema(many=True)
 recipe_cover_schema = RecipeSchema(only=('cover_url',))
 recipe_pagination_schema = RecipePaginationSchema()
 

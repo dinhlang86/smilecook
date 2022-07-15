@@ -12,13 +12,13 @@ from main.models.recipe import Recipe
 from main.utils import hash_password, save_image
 from main.models.user import User
 from main.schemas.user_schema import UserSchema
-from main.schemas.recipe_schema import RecipeSchema
+from main.schemas.recipe_schema import RecipeSchema, RecipePaginationSchema
 from main.extensions import image_set
 
 user_schema = UserSchema()
 user_public_schema = UserSchema(exclude=('email',))
-recipe_list_schema = RecipeSchema(many=True)
 user_avatar_schema = UserSchema(only=('avatar_url',))
+recipe_pagination_chema = RecipePaginationSchema()
 
 class UserListResource(Resource):
     
@@ -75,8 +75,10 @@ class UserRecipeListResource(Resource):
     # visibility = 'private': get all unpublished recipes from this user(need to log in)
     # visibility = 'all': get all published and unpublished recipes from this user(need to log in)
     @jwt_required(optional=True)
-    @use_kwargs({'visibility': fields.Str(missing='public')}, location="query")
-    def get(self, username, visibility):
+    @use_kwargs({'page': fields.Int(missing=1),
+                 'per_page': fields.Int(missing=20),
+                 'visibility': fields.Str(missing='public')}, location="query")
+    def get(self, username, visibility, page, per_page):
         user = User.get_by_username(username=username)
         if user is None:
             return {'message': 'User not found'}, HTTPStatus.NOT_FOUND
@@ -86,8 +88,8 @@ class UserRecipeListResource(Resource):
             pass
         else:
             visibility = 'public'
-        recipes = Recipe.get_all_by_user(user_id=user.id, visibility=visibility)
-        return recipe_list_schema.dump(recipes), HTTPStatus.OK
+        recipes = Recipe.get_all_by_user(user_id=user.id, page=page, per_page=per_page, visibility=visibility)
+        return recipe_pagination_chema.dump(recipes), HTTPStatus.OK
     
 
 class UserAvatarUploadResource(Resource):
