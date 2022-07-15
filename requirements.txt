@@ -1,0 +1,5 @@
+marshmallow>=3.17.0
+webargs>=8.2.0
+Werkzeug>=2.0
+Flask-Reuploaded>=1.2.0
+Pillow>=9.2.0
