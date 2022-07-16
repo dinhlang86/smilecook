@@ -1,11 +1,12 @@
 
+from urllib import response
 from flask import Flask
 from flask_restful import Api
 from flask_migrate import Migrate
 from flask_uploads import configure_uploads
 
 from main.config import Config
-from main.extensions import db, jwt, image_set
+from main.extensions import db, jwt, image_set, cache
 from main.controllers.user_controller import (UserListResource, UserResource, MeResource, 
                                               UserRecipeListResource, UserAvatarUploadResource)
 from main.controllers.recipe_controller import (RecipeListResource, RecipeResource, 
@@ -24,10 +25,25 @@ def register_extensions(app):
     db.init_app(app)
     migrate = Migrate(app, db)
     jwt.init_app(app)
+    # Put logged in user to blocklist to log out
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blacklist(jwt_header, jwt_payload: dict):
         jti = jwt_payload['jti']
         return jti in black_list
+    cache.init_app(app)
+    # Tesing
+    # @app.before_request
+    # def before_request():
+    #     print('\n======Before request========\n')
+    #     print(cache.cache._cache.keys())
+    #     print('\n============================\n')
+    # @app.after_request
+    # def after_request(response):
+    #     print('\n======After request========\n')
+    #     print(cache.cache._cache.keys())
+    #     print('\n============================\n')
+    #     return response
+            
 
 def config_images(app):
     configure_uploads(app, image_set)

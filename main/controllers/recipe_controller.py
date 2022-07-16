@@ -10,7 +10,7 @@ from webargs.flaskparser import use_kwargs
 from main.models.recipe import Recipe
 from main.schemas.recipe_schema import RecipeSchema, RecipePaginationSchema
 from main.utils import save_image
-from main.extensions import image_set
+from main.extensions import image_set, cache
 
 
 recipe_schema = RecipeSchema()
@@ -21,12 +21,16 @@ recipe_pagination_schema = RecipePaginationSchema()
 class RecipeListResource(Resource):
     
     # Get all published recipes
+    # query_string=True: allow passing in of arguments
     @use_kwargs({'page': fields.Int(missing=1),
                  'per_page': fields.Int(missing=20),
                  'q': fields.Str(missing=''),
                  'sort': fields.Str(missing='created_at'),
                  'order': fields.Str(missing='desc')}, location='query')
+    @cache.cached(timeout=60, query_string=True)
     def get(self, q, page, per_page, sort, order):
+        # Testing
+        # print('Querying database...')
         # Accept sort by 'created_at', 'cook_time' and 'num_of_servings', default 'created_at'
         if sort not in ['created_at', 'cook_time', 'num_of_servings']:
             sort = 'created_at'
