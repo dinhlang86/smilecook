@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Api
 from flask_migrate import Migrate
 from flask_uploads import configure_uploads
@@ -62,6 +62,10 @@ def register_resources(app):
     api.add_resource(UserRecipeListResource, '/users/<string:username>/recipes')
     api.add_resource(UserAvatarUploadResource, '/users/avatar')
     api.add_resource(RecipeCoverUploadResource, '/recipes/<int:recipe_id>/cover')
+
+@limiter.request_filter
+def ip_whitelist():
+    return request.remote_addr == '127.0.0.1'
 
 
 if __name__ == '__main__':
