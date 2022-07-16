@@ -20,12 +20,13 @@ class RecipeSchema(Schema):
     name = fields.String(required=True, validate=[validate.Length(max=100)])
     description = fields.String(validate=[validate.Length(max=200)])
     directions = fields.String(validate=[validate.Length(max=1000)])
-    is_published = fields.Boolean(dump_only=True)
-    created_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
+    ingredients = fields.String(validate=[validate.Length(max=1000)])
     num_of_servings = fields.Int(validate=validate_num_of_servings)
     cook_time = fields.Integer()
     cover_url = fields.Method(serialize='dump_cover_url')
+    is_published = fields.Boolean(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
     
     @validates('cook_time')
     def validate_cook_time(self, n):

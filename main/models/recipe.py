@@ -1,3 +1,4 @@
+from email.policy import default
 from operator import or_
 from sqlalchemy import asc, desc, or_
 
@@ -15,6 +16,7 @@ class Recipe(db.Model):
     directions = db.Column(db.String(1000))
     is_published = db.Column(db.Boolean(), default=False)
     cover_image = db.Column(db.String(100), default=None)
+    ingredients = db.Column(db.String(1000))
     created_at = db.Column(db.DateTime(), nullable=False, server_default=db.func.now())
     updated_at = db.Column(db.DateTime(), nullable=False, server_default=db.func.now(), onupdate=db.func.now())
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
