@@ -13,7 +13,7 @@ from main.utils import save_image, clear_cache
 from main.models.user import User
 from main.schemas.user_schema import UserSchema
 from main.schemas.recipe_schema import RecipePaginationSchema
-from main.extensions import image_set
+from main.extensions import image_set, limiter
 
 user_schema = UserSchema()
 user_public_schema = UserSchema(exclude=('email',))
@@ -70,6 +70,7 @@ class MeResource(Resource):
 
 class UserRecipeListResource(Resource):
     
+    decorators = [limiter.limit('3/minute;30/hour;300/day', methods=['GET'], error_message='Too Many Requests')]
     # Get user by username
     # visibility = 'public': get all published recipes from this user(no need to log in)
     # visibility = 'private': get all unpublished recipes from this user(need to log in)
