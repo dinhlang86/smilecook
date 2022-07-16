@@ -9,7 +9,7 @@ from webargs.flaskparser import use_kwargs
 
 from main.models.recipe import Recipe
 from main.schemas.recipe_schema import RecipeSchema, RecipePaginationSchema
-from main.utils import save_image
+from main.utils import save_image, clear_cache
 from main.extensions import image_set, cache
 
 
@@ -53,6 +53,7 @@ class RecipeListResource(Resource):
         recipe = Recipe(**data)
         recipe.user_id = current_user
         recipe.save()
+        clear_cache('/recipes')
         return recipe_schema.dump(recipe), HTTPStatus.CREATED   
     
     
@@ -95,6 +96,7 @@ class RecipeResource(Resource):
         recipe.cook_time = data['cook_time']
         recipe.directions = data['directions']
         recipe.update()
+        clear_cache('/recipes')
         return recipe_schema.dump(recipe), HTTPStatus.OK
     
     #Update some attributes for recipe
@@ -122,6 +124,7 @@ class RecipeResource(Resource):
         recipe.directions = data.get('directions') or recipe.directions
         recipe.ingredients = data.get('ingredients') or recipe.ingredients
         recipe.save()
+        clear_cache('/recipes')
         return recipe_schema.dump(recipe), HTTPStatus.OK
     
     # Delete recipe from authorized user
@@ -134,6 +137,7 @@ class RecipeResource(Resource):
         if (current_user != recipe.user_id):
             return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
         recipe.delete()
+        clear_cache('/recipes')
         return {}, HTTPStatus.NO_CONTENT
     
 
@@ -150,6 +154,7 @@ class RecipePublishResource(Resource):
             return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
         recipe.is_published = True
         recipe.update()
+        clear_cache('/recipes')
         return {}, HTTPStatus.NO_CONTENT
     
     # Update specific recipe to be unpublished from authorized user
@@ -163,6 +168,7 @@ class RecipePublishResource(Resource):
             return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
         recipe.is_published = False
         recipe.update()
+        clear_cache('/recipes')
         return {}, HTTPStatus.NO_CONTENT
         
         
@@ -190,5 +196,6 @@ class RecipeCoverUploadResource(Resource):
         filename = save_image(image=file, folder='covers')
         recipe.cover_image = filename
         recipe.save()
+        clear_cache('/recipes')
         return recipe_cover_schema.dump(recipe), HTTPStatus.OK
         

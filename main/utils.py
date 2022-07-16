@@ -5,7 +5,7 @@ from flask_uploads import extension
 import os
 from PIL import Image
 
-from main.extensions import image_set
+from main.extensions import image_set, cache
 
 def hash_password(password):
     return pbkdf2_sha256.hash(password)
@@ -38,3 +38,9 @@ def compress_image(filename, folder):
     
     os.remove(file_path)
     return compress_filename
+
+# Clear cache with the keys have the prefix
+# *keys: unpacking the list of keys into positional arguments
+def clear_cache(key_prefix):
+    keys = [key for key in cache.cache._cache.keys() if key.startswith(key_prefix)]
+    cache.delete_many(*keys)

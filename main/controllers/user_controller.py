@@ -9,10 +9,10 @@ from webargs.flaskparser import use_kwargs
 import os
 
 from main.models.recipe import Recipe
-from main.utils import hash_password, save_image
+from main.utils import save_image, clear_cache
 from main.models.user import User
 from main.schemas.user_schema import UserSchema
-from main.schemas.recipe_schema import RecipeSchema, RecipePaginationSchema
+from main.schemas.recipe_schema import RecipePaginationSchema
 from main.extensions import image_set
 
 user_schema = UserSchema()
@@ -113,4 +113,5 @@ class UserAvatarUploadResource(Resource):
         filename = save_image(image=file, folder='avatars')
         user.avatar_image = filename
         user.save()
+        clear_cache('/recipes')
         return user_avatar_schema.dump(user), HTTPStatus.OK
