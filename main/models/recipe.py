@@ -1,4 +1,5 @@
-from sqlalchemy import desc
+from operator import or_
+from sqlalchemy import desc, or_
 
 
 from  main.extensions import db
@@ -20,8 +21,10 @@ class Recipe(db.Model):
     user = db.relationship('User', back_populates='recipes')
     
     @classmethod
-    def get_all_published(cls, page, per_page):
-        return cls.query.filter_by(is_published=True).order_by(desc(cls.created_at)).paginate(page=page, per_page=per_page)
+    def get_all_published(cls,q, page, per_page):
+        keyword = f'%{q}%'
+        return cls.query.filter(or_(cls.name.ilike(keyword), cls.description.ilike(keyword)), 
+                                cls.is_published.is_(True)).order_by(desc(cls.created_at)).paginate(page=page, per_page=per_page)
     
     @classmethod
     def get_by_id(cls, recipe_id):
