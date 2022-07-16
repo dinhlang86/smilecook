@@ -1,3 +1,4 @@
+from pickle import GET
 from flask import request
 from flask_restful import Resource
 from http import HTTPStatus
@@ -10,7 +11,7 @@ from webargs.flaskparser import use_kwargs
 from main.models.recipe import Recipe
 from main.schemas.recipe_schema import RecipeSchema, RecipePaginationSchema
 from main.utils import save_image, clear_cache
-from main.extensions import image_set, cache
+from main.extensions import image_set, cache, limiter
 
 
 recipe_schema = RecipeSchema()
@@ -20,6 +21,7 @@ recipe_pagination_schema = RecipePaginationSchema()
 
 class RecipeListResource(Resource):
     
+    decorators = [limiter.limit('2 per minute', methods=['GET'], error_message='Too Many Requests')]
     # Get all published recipes
     # query_string=True: allow passing in of arguments
     @use_kwargs({'page': fields.Int(missing=1),

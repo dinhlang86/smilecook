@@ -16,3 +16,5 @@ class Config:
     CACHE_TYPE = 'SimpleCache'
     # 10 min
     CACHE_DEFAULT_TIMEOUT = 10 * 60
+    
+    RATELIMIT_HEADERS_ENABLED = True

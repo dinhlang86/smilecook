@@ -1,12 +1,11 @@
 
-from urllib import response
 from flask import Flask
 from flask_restful import Api
 from flask_migrate import Migrate
 from flask_uploads import configure_uploads
 
 from main.config import Config
-from main.extensions import db, jwt, image_set, cache
+from main.extensions import db, jwt, image_set, cache, limiter
 from main.controllers.user_controller import (UserListResource, UserResource, MeResource, 
                                               UserRecipeListResource, UserAvatarUploadResource)
 from main.controllers.recipe_controller import (RecipeListResource, RecipeResource, 
@@ -43,6 +42,7 @@ def register_extensions(app):
     #     print(cache.cache._cache.keys())
     #     print('\n============================\n')
     #     return response
+    limiter.init_app(app)
             
 
 def config_images(app):
@@ -62,6 +62,7 @@ def register_resources(app):
     api.add_resource(UserRecipeListResource, '/users/<string:username>/recipes')
     api.add_resource(UserAvatarUploadResource, '/users/avatar')
     api.add_resource(RecipeCoverUploadResource, '/recipes/<int:recipe_id>/cover')
+
 
 if __name__ == '__main__':
     app = create_app()
