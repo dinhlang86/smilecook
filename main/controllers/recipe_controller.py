@@ -116,6 +116,7 @@ class RecipeResource(Resource):
         recipe.num_of_servings = data.get('num_of_servings') or recipe.num_of_servings
         recipe.cook_time = data.get('cook_time') or recipe.cook_time
         recipe.directions = data.get('directions') or recipe.directions
+        recipe.ingredients = data.get('ingredients') or recipe.ingredients
         recipe.save()
         return recipe_schema.dump(recipe), HTTPStatus.OK
     
