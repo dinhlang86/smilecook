@@ -23,9 +23,17 @@ class RecipeListResource(Resource):
     # Get all published recipes
     @use_kwargs({'page': fields.Int(missing=1),
                  'per_page': fields.Int(missing=20),
-                 'q': fields.Str(missing='')}, location='query')
-    def get(self, q, page, per_page):
-        paginated_recipes = Recipe.get_all_published(q=q, page=page, per_page=per_page)
+                 'q': fields.Str(missing=''),
+                 'sort': fields.Str(missing='created_at'),
+                 'order': fields.Str(missing='desc')}, location='query')
+    def get(self, q, page, per_page, sort, order):
+        # Accept sort by 'created_at', 'cook_time' and 'num_of_servings', default 'created_at'
+        if sort not in ['created_at', 'cook_time', 'num_of_servings']:
+            sort = 'created_at'
+        # Accept order by asc or desc, default desc
+        if order not in ['asc', 'desc']:
+            order = 'desc'
+        paginated_recipes = Recipe.get_all_published(q=q, page=page, per_page=per_page, sort=sort, order=order)
         return recipe_pagination_schema.dump(paginated_recipes), HTTPStatus.OK
     
     # Validate and create new recipe with authorized user
