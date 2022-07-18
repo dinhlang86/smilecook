@@ -18,6 +18,8 @@ def create_app():
     env = os.environ.get('ENV', 'Development')
     if env == 'Production':
         config_str = 'main.config.ProductionConfig'
+    if env == 'Staging':
+        config_str = 'main.config.StagingConfig'
     else:
         config_str = 'main.config.DevelopmentConfig'
         
