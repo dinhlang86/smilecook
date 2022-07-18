@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_restful import Api
 from flask_migrate import Migrate
 from flask_uploads import configure_uploads
+import os
 
 from main.config import Config
 from main.extensions import db, jwt, image_set, cache, limiter
@@ -13,8 +14,15 @@ from main.controllers.recipe_controller import (RecipeListResource, RecipeResour
 from main.controllers.token import TokenResource, RefreshTokenResource, RevokeResource, black_list
 
 def create_app():
+    # Set config type (Development, Production)
+    env = os.environ.get('ENV', 'Development')
+    if env == 'Production':
+        config_str = 'main.config.ProductionConfig'
+    else:
+        config_str = 'main.config.DevelopmentConfig'
+        
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_str)
     register_extensions(app)
     register_resources(app)
     config_images(app)
